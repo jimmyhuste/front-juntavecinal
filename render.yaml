@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: front-juntavecinal
+    env: node
+    buildCommand: npm install --legacy-peer-deps && npm run build
+    startCommand: npm start
+    nodeVersion: 18.17.0
+    envVars:
+      - key: NODE_ENV
+        value: production
