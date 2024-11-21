@@ -241,7 +241,7 @@ export const ViewNews = () => {
                 </div>
             )}
 
-            {/* Modificado el mensaje de "no hay más noticias" */}
+            {/* Modificado el mensaje de "no hay más noticias"
             {!hasMore && articles.length > 0 && (
                 <div className="max-w-2xl mx-auto mt-8">
                     <div className="flex flex-col items-center justify-center p-8 bg-gray-700 rounded-lg border-2 border-gray-600">
@@ -254,7 +254,7 @@ export const ViewNews = () => {
                         </p>
                     </div>
                 </div>
-            )}
+            )} */}
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
