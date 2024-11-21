@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
+
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function Login() {
@@ -9,18 +12,60 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loginMessage, setLoginMessage] = useState('');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { themes } = useTheme();
+
   const handleRutChange = (e) => {
     setRut(e.target.value);
   };
-  
 
   function limpiarRut(rut) {
-      // Elimina los puntos y el guion del RUT
-      return rut.replace(/[.-]/g, '');
-  } 
-  
+    return rut.replace(/[.-]/g, '');
+  }
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      // Decodificar el token para obtener el email
+      const decoded = jwtDecode(credentialResponse.credential);
+      const email = decoded.email;
+
+      console.log('Email del usuario:', email);
+
+      // Enviar el email a tu API
+      const response = await axios.post(`${BASE_URL}/login/`, {
+        email: email,
+        isGoogleLogin: true
+      });
+
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        setLoginMessage('Inicio de sesión con Google exitoso');
+        navigate('/panel');
+      } else {
+        setLoginMessage('Error: No se recibió un token válido del servidor.');
+      }
+
+    } catch (error) {
+      console.error('Error en login con Google:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          setLoginMessage('Usuario no registrado. Por favor, regístrate primero.');
+        } else {
+          setLoginMessage('Error en el servidor. Por favor, intenta más tarde.');
+        }
+      } else if (error.request) {
+        setLoginMessage('No se pudo conectar con el servidor. Verifica tu conexión a internet.');
+      } else {
+        setLoginMessage('Error al procesar la respuesta de Google.');
+      }
+    }
+  };
+
+  const handleGoogleError = () => {
+    console.log('Login Failed');
+    setLoginMessage('Error al iniciar sesión con Google. Por favor, intenta de nuevo.');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -45,17 +90,13 @@ export default function Login() {
           password
         });
 
-        console.log('Respuesta del servidor:', response.data);
-
         if (response.data && response.data.token) {
-          // Almacenar el token en el localStorage
           localStorage.setItem('token', response.data.token);
           setLoginMessage('Inicio de sesión exitoso');
-          navigate('/panel'); // Redirigir al panel u otra página después de iniciar sesión
+          navigate('/panel');
         } else {
           setLoginMessage('Error: No se recibió un token válido del servidor.');
         }
-        
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
         if (error.response) {
@@ -74,21 +115,43 @@ export default function Login() {
   };
 
   const handleCreateAccount = () => {
-    console.log('Redirigiendo a la página de creación de cuenta...');
     navigate('/register');
   };
 
   return (
     <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8" style={{ backgroundColor: themes.background }}>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <img className="mx-auto h-10 w-auto" src="/diversity.png" alt="Junta Vecinos" />
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight" style={{ color: themes.text }}>
+        <h2 className="text-center text-2xl font-bold leading-9 tracking-tight" style={{ color: themes.text }}>
           Inicia sesión en tu cuenta
         </h2>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-gray-800 px-8 py-10 rounded-lg">
+          <div className="mb-6 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              type="standard"
+              theme="filled_blue"
+              size="large"
+              text="continue_with"
+              shape="rectangular"
+              width="382px"
+              locale="es"
+            />
+          </div>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-600"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-gray-800 px-2 text-gray-400">O continúa con</span>
+            </div>
+          </div>
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="rut" className="block text-sm font-medium leading-6 text-white">
@@ -100,11 +163,11 @@ export default function Login() {
                   name="rut"
                   type="text"
                   autoComplete="rut"
-                  placeholder='Ingrese su Usuario (11111111-1)'
+                  placeholder="Ingrese su Usuario (11111111-1)"
                   value={rut}
                   onChange={handleRutChange}
                   required
-                  className="block w-full rounded-md bg-gray-700 py-2 px-3 text-white placeholder:text-gray-400 border-0 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-lg bg-gray-700 py-2.5 px-3 text-white placeholder:text-gray-400 border-0 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 />
                 {errors.rut && <p className="mt-2 text-sm text-red-500">{errors.rut}</p>}
               </div>
@@ -119,12 +182,12 @@ export default function Login() {
                   id="password"
                   name="password"
                   type="password"
-                  placeholder='Ingrese su Contraseña'
+                  placeholder="Ingrese su Contraseña"
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="block w-full rounded-md bg-gray-700 py-2 px-3 text-white placeholder:text-gray-400 border-0 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-lg bg-gray-700 py-2.5 px-3 text-white placeholder:text-gray-400 border-0 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 />
                 {errors.password && <p className="mt-2 text-sm text-red-500">{errors.password}</p>}
               </div>
@@ -139,7 +202,7 @@ export default function Login() {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                className="flex w-full justify-center rounded-lg bg-blue-600 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
               >
                 Iniciar sesión
               </button>
@@ -148,7 +211,10 @@ export default function Login() {
 
           <div className="mt-6 text-center">
             <span className="text-white">¿No tienes una cuenta? </span>
-            <span onClick={handleCreateAccount} className="cursor-pointer text-blue-500 hover:text-blue-400 hover:underline">
+            <span
+              onClick={handleCreateAccount}
+              className="text-blue-500 hover:text-blue-400 hover:underline cursor-pointer"
+            >
               Créala aquí
             </span>
           </div>

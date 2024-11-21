@@ -186,7 +186,7 @@ export const ViewNews = () => {
                     {articles.map((article, index) => (
                         <div key={article.id} className="rounded-lg shadow-md overflow-hidden" style={{ backgroundColor: themes.card, color: themes.text }}>
                             <img
-                                src={`${BASE_URL}/${article.urlToImage}`}
+                                src={`${BASE_URL}${article.urlToImage}`}
                                 alt={article.title}
                                 className="w-full h-48 object-cover"
                             />
@@ -284,7 +284,7 @@ export const ViewNews = () => {
                             <p><b>{selectedArticle.category}</b></p>
                         </div>
                         <img
-                            src={`http://localhost:8000/${selectedArticle.urlToImage}`}
+                            src={`${BASE_URL}${selectedArticle.urlToImage}`}
                             alt={selectedArticle.title}
                             className="w-full h-64 object-cover rounded-lg shadow-md"
                         />

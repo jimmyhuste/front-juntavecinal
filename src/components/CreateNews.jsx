@@ -57,17 +57,13 @@ export const CreateNews = () => {
       newErrors.title = "El título es obligatorio";
     } else if (formData.title.length < 10) {
       newErrors.title = "El título debe tener al menos 10 caracteres";
-    } else if (formData.title.length > 100) {
-      newErrors.title = "El título no puede exceder los 100 caracteres";
-    }
+    } 
 
     if (!formData.description) {
       newErrors.description = "La descripción es obligatoria";
     } else if (formData.description.length < 50) {
       newErrors.description = "La descripción debe tener al menos 50 caracteres";
-    } else if (formData.description.length > 1000) {
-      newErrors.description = "La descripción no puede exceder los 1000 caracteres";
-    }
+    } 
 
     if (!formData.source) {
       newErrors.source = "La fuente es obligatoria";

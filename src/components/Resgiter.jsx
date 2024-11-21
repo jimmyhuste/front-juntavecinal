@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import validarRut from '../middlewares/validarRut';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import regionesData from '../../src/utils/comunaRegion.json'
+
+const {regiones, comunasPorRegion} = regionesData;
 
 // Validaciones
 const isValidCharacter = (value) => /^[A-Za-zÀ-ÿ\s]+$/.test(value);
 const isValidChileanPhoneNumber = (phone) => /^9\d{8}$/.test(phone);
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -23,12 +28,27 @@ const Register = () => {
     role: 'MEMBER',
     photo: null,
     housingType: '',
-    dateOfBirth: '', // Nuevo campo añadido
+    dateOfBirth: '', 
+    comuna: '', 
+    region: '', 
   });
 
   const { themes } = useTheme();
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const [availableComunas, setAvailableComunas] = useState([]);
+
+
+  useEffect(() => {
+    if (formData.region) {
+      setAvailableComunas(comunasPorRegion[formData.region] || []);
+      if (!comunasPorRegion[formData.region]?.includes(formData.comuna)) {
+        setFormData(prev => ({ ...prev, comuna: '' }));
+      }
+    } else {
+      setAvailableComunas([]);
+    }
+  }, [formData.region]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -140,13 +160,21 @@ const Register = () => {
     } else if (formData.password.length < 6) {
       newErrors.password = "La contraseña debe tener al menos 6 caracteres";
     }
+    // Validación región y comuna
+    if (!formData.region) {
+      newErrors.region = "Debe seleccionar una región";
+    }
+
+    if (!formData.comuna) {
+      newErrors.comuna = "Debe seleccionar una comuna";
+    }
 
     return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validar formulario
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
@@ -155,31 +183,41 @@ const Register = () => {
       console.log(firstError);
       return;
     }
-
+  
     try {
-      // Crear FormData y agregar todos los campos
       const formDataToSend = new FormData();
-
-      // Agregar campos de texto
+      
+      // Obtener el nombre de la región seleccionada
+      const regionSeleccionada = regiones.find(r => r.id === formData.region);
+      const nombreRegion = regionSeleccionada ? regionSeleccionada.name : '';
+      
+      // Agregar campos al FormData
       Object.keys(formData).forEach(key => {
         if (key === 'rut') {
           formDataToSend.append(key, formData[key].replace(/\./g, '').toUpperCase());
         } else if (key === 'photo') {
-          // Solo agregar la foto si existe
           if (formData.photo) {
             formDataToSend.append(key, formData.photo);
           }
+        } else if (key === 'region') {
+          // Enviar el nombre de la región
+          formDataToSend.append(key, nombreRegion);
         } else {
           formDataToSend.append(key, formData[key]);
         }
       });
-
+  
+      // Imprimir el FormData para depuración
+      for (let pair of formDataToSend.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+      console.log(formDataToSend)
       const response = await axios.post(`${BASE_URL}/register/`, formDataToSend, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Importante para archivos
+          'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       Swal.fire({
         icon: 'success',
         title: 'Registro exitoso',
@@ -187,15 +225,14 @@ const Register = () => {
         timer: 2000,
         timerProgressBar: true
       });
-
+  
       navigate('/panel');
-
+  
     } catch (error) {
       console.error('Error al registrarse:', error);
-
-      // Manejo mejorado de errores
+      
       let errorMessage = "Hubo un error al registrar al usuario. Por favor, intente nuevamente.";
-
+  
       if (error.response) {
         if (error.response.data.rut) {
           errorMessage = error.response.data.rut[0];
@@ -205,7 +242,7 @@ const Register = () => {
           errorMessage = error.response.data.detail;
         }
       }
-
+  
       Swal.fire({
         icon: 'error',
         title: 'Error en el registro',
@@ -355,6 +392,55 @@ const Register = () => {
                     sm:text-sm sm:leading-6`}
                 />
                 {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+              </div>
+            </div>
+
+            {/* Región */}
+            <div>
+              <label htmlFor="region" className="block text-sm font-medium leading-6 text-white">
+                Región
+              </label>
+              <div className="mt-2">
+                <select
+                  id="region"
+                  name="region"
+                  value={formData.region}
+                  onChange={handleChange}
+                  required
+                  className="block w-full rounded-md bg-gray-700 py-2 px-3 text-white border-0 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                >
+                  <option value="">Seleccione una región</option>
+                  {regiones.map(region => (
+                    <option key={region.id} value={region.id}>{region.name}</option>
+                  ))}
+                </select>
+                {errors.region && <p className="text-red-500 text-xs mt-1">{errors.region}</p>}
+              </div>
+            </div>
+
+            {/* Comuna */}
+            <div>
+              <label htmlFor="comuna" className="block text-sm font-medium leading-6 text-white">
+                Comuna
+              </label>
+              <div className="mt-2">
+                <select
+                  id="comuna"
+                  name="comuna"
+                  value={formData.comuna}
+                  onChange={handleChange}
+                  required
+                  disabled={!formData.region}
+                  className={`block w-full rounded-md bg-gray-700 py-2 px-3 text-white border-0 
+                    focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 
+                    ${!formData.region ? 'opacity-50' : ''}`}
+                >
+                  <option value="">Seleccione una comuna</option>
+                  {availableComunas.map(comuna => (
+                    <option key={comuna} value={comuna}>{comuna}</option>
+                  ))}
+                </select>
+                {errors.comuna && <p className="text-red-500 text-xs mt-1">{errors.comuna}</p>}
               </div>
             </div>
 

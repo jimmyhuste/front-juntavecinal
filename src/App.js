@@ -1,4 +1,5 @@
 import React from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Login';
 import Register from './components/Resgiter';
@@ -125,11 +126,13 @@ const AppContent = () => {
 
 function App() {
   return (
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENTID}>
     <ThemeProvider>
       <Router>
         <AppContent />
       </Router>
     </ThemeProvider>
+  </GoogleOAuthProvider>
   );
 }
 
