@@ -134,7 +134,7 @@ const Dashboard = () => {
           <Grid item xs={12} md={6}>
             <div style={{ backgroundColor: cardBgColor }} className="p-4 rounded-lg">
               <h3 className="text-xl font-semibold mb-4" style={{ color: textColor }}>
-                Demografía de Usuarios y Miembros
+                Distribución de Miembros por Edad
               </h3>
               <PieChart
                 colors={['#38bdf8', '#14b8a6', '#c084fc', '#f472b6']}
