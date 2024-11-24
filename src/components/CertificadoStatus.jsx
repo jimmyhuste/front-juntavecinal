@@ -238,7 +238,7 @@ const CertificadoStatus = () => {
 
     return (
         <div className="flex-1 p-6 overflow-y-auto h-screen w-full mt-8" style={{ backgroundColor: themes.background }}>
-            <div className="max-w-7xl rounded-lg p-8 mx-auto bg-gray-800">
+            <div className="w-full rounded-lg p-8 mx-auto bg-gray-800">
                 <h2 className="mb-8 text-center text-2xl font-bold leading-9 text-white">
                     Estado de Mis Solicitudes
                 </h2>
@@ -254,7 +254,7 @@ const CertificadoStatus = () => {
                         </p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto rounded-lg shadow-lg border-2 border-gray-600">
+                    <div className="rounded-lg shadow-lg border-2 border-gray-600">
                         <table className="min-w-full bg-gray-800 text-white">
                             <thead>
                                 <tr className="bg-gray-900 border border-gray-700">
@@ -263,6 +263,7 @@ const CertificadoStatus = () => {
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Rut</th>
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Fecha de Solicitud</th>
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Relación</th>
+                                    <th className="py-3 px-4 text-left font-semibold text-gray-200">Tipo Certificado</th>
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Estado</th>
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Acción</th>
                                 </tr>
@@ -277,6 +278,7 @@ const CertificadoStatus = () => {
                                             {dayjs(request.dateCreation).format('DD/MM/YYYY : HH:mm:ss')}
                                         </td>
                                         <td className="py-3 px-4 text-gray-300">{request.relationship.toUpperCase()}</td>
+                                        <td className="py-3 px-4 text-gray-300">{request.typeCertificate}</td>
                                         <td className="py-3 px-4 text-gray-300">
                                             <div className="flex items-center gap-2">
                                                 {getStatusConfig(request.status).icon}
