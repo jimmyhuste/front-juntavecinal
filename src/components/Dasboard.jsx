@@ -48,19 +48,28 @@ const Dashboard = () => {
 
   const transformMonthlyData = (data) => {
     if (!data) return [];
-    return data.map(item => ({
-      month: new Date(item.month).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
-      visits: item.count
-    }));
+    return data.map(item => {
+      // Separamos el año y mes
+      const [year, month] = item.month.split('-');
+      // Creamos la fecha con el día 1 para asegurar consistencia
+      // Restamos 1 al mes porque JavaScript espera meses en base 0
+      const date = new Date(year, parseInt(month) - 1, 1);
+      
+      return {
+        month: capitalize(date.toLocaleDateString('es-ES', { 
+          month: 'long',
+          year: 'numeric'
+        })),
+        visits: item.count
+      };
+    });
   };
-
-  // Configuración común para los gráficos
-  const chartSettings = {
-    width: 450,
-    height: 250,
-    margin: { top: 20, bottom: 20, left: 20, right: 20 },
+  
+  // Helper function to capitalize first letter
+  const capitalize = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   };
-
+  
   // Configuración específica para gráficos circulares
   const pieChartSettings = {
     width: 450,

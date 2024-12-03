@@ -41,8 +41,6 @@ const SidebarPanel = () => {
     const [rut, setRut] = useState(null);
     const [rol, setRole] = useState(null);
     const { themes } = useTheme();
-    // const [activeSection, setActiveSection] = useState('dashboard');
-    // const [viewDashboard, setViewDashboard] = useState(true);
     const [activeSection, setActiveSection] = useState(localStorage.getItem('lastSection') || 'dashboard');
     const [viewDashboard, setViewDashboard] = useState(localStorage.getItem('lastSection') === 'dashboard' || !localStorage.getItem('lastSection'));
 
@@ -55,7 +53,25 @@ const SidebarPanel = () => {
                 const { exp, rut, rol } = decodedToken;
                 setRut(rut);
                 setRole(rol);
-
+    
+                // Obtener la última sección visitada
+                const lastSection = localStorage.getItem('lastSection');
+    
+                // Si no hay última sección, entonces establecer la vista por defecto según el rol
+                if (!lastSection) {
+                    if (rol === "2") {
+                        setViewDashboard(false);
+                        setViewNews(true);
+                        setActiveSection('news');
+                        localStorage.setItem('lastSection', 'news');
+                    } else if (rol === "1") {
+                        setViewDashboard(true);
+                        setViewNews(false);
+                        setActiveSection('dashboard');
+                        localStorage.setItem('lastSection', 'dashboard');
+                    }
+                }
+    
                 if (exp * 1000 < Date.now()) {
                     localStorage.removeItem('token');
                     navigate('/login');

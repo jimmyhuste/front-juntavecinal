@@ -4,15 +4,39 @@ import Swal from 'sweetalert2';
 import { useValidateRoleAndAccessToken } from '../middlewares/validateRoleAndAccessToken';
 import { useTheme } from '../context/ThemeContext';
 import { jwtDecode } from 'jwt-decode';
-import {formatRut} from '../middlewares/formatRut'
-
+import { formatRut } from '../middlewares/formatRut';
+import { FaTrashAlt } from 'react-icons/fa';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+
+const Loader = () => {
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="blue">
+                <g fill="none" fillRule="evenodd">
+                    <g transform="translate(1 1)" strokeWidth="2">
+                        <circle strokeOpacity=".5" cx="18" cy="18" r="18"/>
+                        <path d="M36 18c0-9.94-8.06-18-18-18">
+                            <animateTransform
+                                attributeName="transform"
+                                type="rotate"
+                                from="0 18 18"
+                                to="360 18 18"
+                                dur="1s"
+                                repeatCount="indefinite"/>
+                        </path>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    );
+};
 
 const FamilyMemberDetails = () => {
     const [user, setUser] = useState(null);
     const [familyMembers, setFamilyMembers] = useState([]);
     const [rut, setRut] = useState(null);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
 
@@ -38,6 +62,47 @@ const FamilyMemberDetails = () => {
         }
     }, [rut]);
 
+    const handleDeleteMember = (rutMember) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Una vez eliminado, no podrás recuperar este miembro de familia.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`${BASE_URL}/family/member/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        rut: rut,
+                        rutMember: rutMember
+                    }),
+                })
+                .then((response) => {
+                    if (response.ok) {
+                        setFamilyMembers(prevMembers => 
+                            prevMembers.filter(member => member.rut !== rutMember)
+                        );
+                        Swal.fire('¡Eliminado!', 'El miembro ha sido eliminado con éxito.', 'success');
+                    } else {
+                        Swal.fire('Error', 'No se pudo eliminar el miembro.', 'error');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Hubo un problema al eliminar el miembro.', 'error');
+                });
+            }
+        });
+    };
+
     const getRoleName = (role) => {
         switch (role) {
             case 1:
@@ -51,6 +116,7 @@ const FamilyMemberDetails = () => {
 
     const fetchUserDetails = async () => {
         try {
+            setLoading(true);
             const response = await fetch(`${BASE_URL}/user/list/one/?rut=${rut}`, {
                 method: 'GET',
                 headers: {
@@ -69,6 +135,8 @@ const FamilyMemberDetails = () => {
             console.error('Error:', error);
             Swal.fire('Error', 'No se pudieron obtener los detalles del usuario.', 'error');
             navigate('/panel');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -90,9 +158,12 @@ const FamilyMemberDetails = () => {
             setFamilyMembers(data);
         } catch (error) {
             console.error('Error:', error);
-            //Swal.fire('Error', 'No se pudieron obtener los miembros de la familia.', 'error');
         }
     };
+
+    if (loading) {
+        return <Loader />;
+    }
 
     return (
         <div className="w-full h-screen bg-gray-100" style={{ backgroundColor: themes.background, color: themes.text }}>
@@ -159,7 +230,7 @@ const FamilyMemberDetails = () => {
                         </div>
                     </form>
                 ) : (
-                    <p className="text-gray-400">Cargando detalles del usuario...</p>
+                    <Loader />
                 )}
 
                 <div className="w-full text-center">
@@ -177,6 +248,7 @@ const FamilyMemberDetails = () => {
                                     <th className="py-3 px-4 text-left font-semibold border border-gray-700 text-gray-200">Apellido</th>
                                     <th className="py-3 px-4 text-left font-semibold border border-gray-700 text-gray-200">Relación</th>
                                     <th className="py-3 px-4 text-left font-semibold border border-gray-700 text-gray-200">N° Familia</th>
+                                    <th className="py-3 px-4 text-left font-semibold border border-gray-700 text-gray-200">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700">
@@ -187,6 +259,21 @@ const FamilyMemberDetails = () => {
                                         <td className="py-3 px-4 border border-gray-700 text-gray-300">{member.lastName}</td>
                                         <td className="py-3 px-4 border border-gray-700 text-gray-300">{member.relationship}</td>
                                         <td className="py-3 px-4 border border-gray-700 text-gray-300">{member.family.toString().padStart(4, '0')}</td>
+                                        <td className="py-3 px-4 border border-gray-700 text-gray-300 text-center">
+                                            <div className="flex justify-center">
+                                                <button
+                                                    title={member.relationship.toUpperCase() === 'JEFE HOGAR' ? "No puedes eliminar al jefe de hogar" : "Delete"}
+                                                    className={`${member.relationship.toUpperCase() === 'JEFE HOGAR'
+                                                            ? 'text-gray-500'
+                                                            : 'text-red-600 hover:text-red-500'
+                                                        }`}
+                                                    onClick={() => member.relationship.toUpperCase() !== 'JEFE HOGAR' && handleDeleteMember(member.rut)}
+                                                    disabled={member.relationship.toUpperCase() === 'JEFE HOGAR'}
+                                                >
+                                                    <FaTrashAlt className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

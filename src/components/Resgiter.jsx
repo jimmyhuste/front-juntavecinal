@@ -37,6 +37,7 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const [availableComunas, setAvailableComunas] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
 
   useEffect(() => {
@@ -253,6 +254,28 @@ const Register = () => {
     }
   };
 
+  const Loader = () => {
+    return (
+        <div className="flex justify-center items-center">
+            <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="white">
+                <g fill="none" fillRule="evenodd">
+                    <g transform="translate(1 1)" strokeWidth="2">
+                        <circle strokeOpacity=".5" cx="18" cy="18" r="18"/>
+                        <path d="M36 18c0-9.94-8.06-18-18-18">
+                            <animateTransform
+                                attributeName="transform"
+                                type="rotate"
+                                from="0 18 18"
+                                to="360 18 18"
+                                dur="1s"
+                                repeatCount="indefinite"/>
+                        </path>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    );
+};
   return (
     <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8" style={{ backgroundColor: themes.background }}>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -531,14 +554,15 @@ const Register = () => {
 
             {/* Botón de envío */}
             <div className="sm:col-span-2">
-              <button
-                type="submit"
-                className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold 
-                         leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline 
-                         focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-              >
-                Crear cuenta
-              </button>
+            <button
+    type="submit"
+    className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold 
+             leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline 
+             focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+    disabled={isLoading}
+>
+    {isLoading ? <Loader /> : "Crear cuenta"}
+</button>
             </div>
           </form>
         </div>

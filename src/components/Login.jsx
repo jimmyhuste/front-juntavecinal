@@ -7,11 +7,35 @@ import { jwtDecode } from 'jwt-decode';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+const Loader = () => {
+    return (
+        <div className="flex justify-center items-center">
+            <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="white">
+                <g fill="none" fillRule="evenodd">
+                    <g transform="translate(1 1)" strokeWidth="2">
+                        <circle strokeOpacity=".5" cx="18" cy="18" r="18"/>
+                        <path d="M36 18c0-9.94-8.06-18-18-18">
+                            <animateTransform
+                                attributeName="transform"
+                                type="rotate"
+                                from="0 18 18"
+                                to="360 18 18"
+                                dur="1s"
+                                repeatCount="indefinite"/>
+                        </path>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    );
+};
+
 export default function Login() {
   const [rut, setRut] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loginMessage, setLoginMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { themes } = useTheme();
 
@@ -25,13 +49,12 @@ export default function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      // Decodificar el token para obtener el email
+      setIsLoading(true);
       const decoded = jwtDecode(credentialResponse.credential);
       const email = decoded.email;
 
       console.log('Email del usuario:', email);
 
-      // Enviar el email a tu API
       const response = await axios.post(`${BASE_URL}/login/`, {
         email: email,
         isGoogleLogin: true
@@ -58,6 +81,8 @@ export default function Login() {
       } else {
         setLoginMessage('Error al procesar la respuesta de Google.');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -71,6 +96,7 @@ export default function Login() {
     const newErrors = {};
     setLoginMessage('');
     setErrors({});
+    setIsLoading(true);
 
     let rutFormated = limpiarRut(rut);
     if (!rutFormated) {
@@ -110,7 +136,11 @@ export default function Login() {
         } else {
           setLoginMessage('Ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.');
         }
+      } finally {
+        setIsLoading(false);
       }
+    } else {
+      setIsLoading(false);
     }
   };
 
@@ -203,8 +233,9 @@ export default function Login() {
               <button
                 type="submit"
                 className="flex w-full justify-center rounded-lg bg-blue-600 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                disabled={isLoading}
               >
-                Iniciar sesión
+                {isLoading ? <Loader /> : "Iniciar sesión"}
               </button>
             </div>
           </form>
