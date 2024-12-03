@@ -142,12 +142,6 @@ export const FamilyRegister = () => {
 
     if (!validateForm()) {
       const errorMessages = Object.values(errors).join('\n');
-      // Swal.fire({
-      //   title: 'Error de Validación',
-      //   text: 'Por favor, corrija los siguientes errores:\n' + errorMessages,
-      //   icon: 'error',
-      //   confirmButtonText: 'Entendido'
-      // });
       console.log(errorMessages)
       return;
     }
@@ -178,14 +172,16 @@ export const FamilyRegister = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-
+    
       let errorMessage = 'Error al registrar el miembro';
-      if (error.response?.data?.error) {
+      if (error.response?.status === 400 && error.response?.data?.error === 'Family member with this rut already exists') {
+        errorMessage = 'El integrante ya existe en tu grupo familiar';
+      } else if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
       } else if (error.message) {
         errorMessage = error.message;
       }
-
+    
       await Swal.fire({
         title: 'Error',
         text: errorMessage,
@@ -194,8 +190,6 @@ export const FamilyRegister = () => {
         timer: 5000,
         timerProgressBar: true
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

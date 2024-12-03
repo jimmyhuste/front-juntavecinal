@@ -432,7 +432,7 @@ const SidebarPanel = () => {
     
 
     return (
-        <div className="flex" style={{ backgroundColor: themes.background, color: themes.text }}>
+        <div className="flex flex-col md:flex-row" style={{ backgroundColor: themes.background, color: themes.text }}>
             <div
                 className={`transition-width duration-300 ${isOpen ? 'w-64' : 'w-16'} h-screen relative flex flex-col shadow-md border border-gray-700`}
                 style={{ backgroundColor: '#2d3748', color: '#f7fafc' }}

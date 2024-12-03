@@ -176,9 +176,7 @@ const ViewUser = () => {
                 </div>
             </div>
 
-            <p className="mb-4" style={{ color: themes.text }}>
-                Una lista de todos los usuarios en tu cuenta, incluyendo su nombre, rut, correo electrónico y rol.
-            </p>
+    
 
             <div className="overflow-x-auto rounded-lg shadow-lg border-2 border-gray-600">
                 <table className="min-w-full bg-gray-800 text-white">
