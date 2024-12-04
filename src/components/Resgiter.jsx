@@ -235,6 +235,18 @@ const Register = () => {
       let errorMessage = "Hubo un error al registrar al usuario. Por favor, intente nuevamente.";
 
       if (error.response) {
+        if (error.response.status === 400 && error.response.data.error === "Invalid comuna request") {
+          errorMessage = "Comuna inválida. Por favor, seleccione una comuna válida.";
+        } else if (error.response.data.rut) {
+          errorMessage = error.response.data.rut[0];
+        } else if (error.response.data.photo) {
+          errorMessage = "Error con la foto: " + error.response.data.photo[0];
+        } else if (error.response.data.detail) {
+          errorMessage = error.response.data.detail;
+        }
+      }
+      
+      if (error.response) {
         if (error.response.data.rut) {
           errorMessage = error.response.data.rut[0];
         } else if (error.response.data.photo) {

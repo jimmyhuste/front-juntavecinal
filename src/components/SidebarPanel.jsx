@@ -176,7 +176,7 @@ const SidebarPanel = () => {
         { id: 'certificadoStatus', label: 'Consultar Solicitudes', keywords: ['certificados', 'consultar', 'solicitudes'], roles: ['1', '2'], action: () => handleCertificadoStatusClick() },
         { id: 'createNews', label: 'Publicar Noticia', keywords: ['noticias', 'publicar', 'crear'], roles: ['1'], action: () => handleCreateNewsClick() },
         { id: 'news', label: 'Ver Noticias', keywords: ['noticias', 'ver', 'lista'], roles: ['1', '2'], action: () => handleNewsClick() },
-        { id: 'mapa', label: 'Mapas', keywords: ['mapas', 'mapa', 'ubicación'], roles: ['1'], action: () => handleMapaClick() }
+        { id: 'mapa', label: 'Mapa', keywords: ['mapas', 'mapa', 'ubicación'], roles: ['1'], action: () => handleMapaClick() }
     ];
     
     const messageRef = useRef(null);
@@ -625,7 +625,7 @@ const SidebarPanel = () => {
                                     onClick={handleMapaClick}
                                 >
                                     <FaMap className="mr-2" />
-                                    <span>Mapas</span>
+                                    <span>Mapa</span>
                                 </div>
                             )}
                         </>
