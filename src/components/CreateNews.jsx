@@ -12,8 +12,7 @@ export const CreateNews = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { themes } = useTheme();
-  
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     title: '',
     description: '',
     source: '',
@@ -21,15 +20,24 @@ export const CreateNews = () => {
     publishedAt: '',
     dateVigencia: '',
     category: '',
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
   const [imageFile, setImageFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [rol, setRol] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const token = localStorage.getItem('token');
 
   const handleBack = () => navigate(-1);
+
+  const resetForm = () => {
+    setFormData(initialFormState);
+    setImageFile(null);
+    setErrors({});
+  };
 
   const checkUserRole = () => {
     if (token) {
@@ -57,13 +65,13 @@ export const CreateNews = () => {
       newErrors.title = "El título es obligatorio";
     } else if (formData.title.length < 10) {
       newErrors.title = "El título debe tener al menos 10 caracteres";
-    } 
+    }
 
     if (!formData.description) {
       newErrors.description = "La descripción es obligatoria";
     } else if (formData.description.length < 50) {
       newErrors.description = "La descripción debe tener al menos 50 caracteres";
-    } 
+    }
 
     if (!formData.source) {
       newErrors.source = "La fuente es obligatoria";
@@ -114,17 +122,16 @@ export const CreateNews = () => {
     return newErrors;
   };
 
-  // Función para el formato de edición
   const formatDateForAPIEdit = (dateString) => {
     const date = dayjs(dateString);
-    return date.format('YYYY-MM-DDTHH:mm:ss'); // Formato para edición
+    return date.format('YYYY-MM-DDTHH:mm:ss');
   };
 
-  // Función para el formato de creación
   const formatDateForAPICreate = (dateString) => {
     const date = dayjs(dateString);
-    return date.format('YYYY-MM-DD HH:mm'); // Formato para creación
+    return date.format('YYYY-MM-DD HH:mm');
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -189,13 +196,14 @@ export const CreateNews = () => {
       setErrors(validationErrors);
       return;
     }
-     
-  
+
+    setIsSubmitting(true);
+
     const dataToSend = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       dataToSend.append(key, value);
     });
-    // Usar el formato según el caso (edición o creación)
+
     if (isEditing) {
       dataToSend.append('publishedAt', formatDateForAPIEdit(formData.publishedAt));
       dataToSend.append('dateVigencia', formatDateForAPIEdit(formData.dateVigencia));
@@ -221,17 +229,30 @@ export const CreateNews = () => {
         },
       });
 
-      Swal.fire('Éxito', `Noticia ${isEditing ? 'editada' : 'creada'} correctamente.`, 'success');
+      await Swal.fire({
+        title: 'Éxito',
+        text: `Noticia ${isEditing ? 'editada' : 'creada'} correctamente.`,
+        icon: 'success',
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
+
+      if (!isEditing) {
+        resetForm();
+      }
       navigate('/panel');
 
     } catch (error) {
       Swal.fire('Error', error.response?.data?.error || 'Hubo un problema al procesar la solicitud.', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="flex-1 p-6 overflow-y-auto h-screen w-full" style={{ backgroundColor: themes.background }}>
-    <div className="max-w-3xl rounded-lg p-8 mx-auto bg-gray-800">
+      <div className="max-w-3xl rounded-lg p-8 mx-auto bg-gray-800">
         {isEditing && (
           <div className="mb-4 text-left">
             <button
@@ -384,14 +405,25 @@ export const CreateNews = () => {
           <div className="sm:col-span-2">
             <button
               type="submit"
+              disabled={isSubmitting}
               className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
             >
-              {isEditing ? 'Actualizar Noticia' : 'Crear Noticia'}
+              {isSubmitting ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {isEditing ? 'Actualizando...' : 'Creando...'}
+                </div>
+              ) : (
+                isEditing ? 'Actualizar Noticia' : 'Crear Noticia'
+              )}
             </button>
           </div>
         </form>
+      </div>
     </div>
-</div>
 
   );
 };

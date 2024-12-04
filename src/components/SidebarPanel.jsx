@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import {
@@ -179,6 +179,21 @@ const SidebarPanel = () => {
         { id: 'mapa', label: 'Mapas', keywords: ['mapas', 'mapa', 'ubicación'], roles: ['1'], action: () => handleMapaClick() }
     ];
     
+    const messageRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (messageRef.current && !messageRef.current.contains(event.target)) {
+                setSearchTerm('');
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     const getMenuIcon = (id) => {
         const icons = {
             dashboard: <FaTachometerAlt />,
@@ -228,23 +243,7 @@ const SidebarPanel = () => {
             });
         } else if (filtered.length === 1) {
             filtered[0].action();
-        } else {
-            Swal.fire({
-                title: 'Resultados de búsqueda',
-                html: `
-                    <div class="text-left">
-                        ${filtered.map((item, index) => `
-                            <div class="cursor-pointer hover:bg-gray-100 p-2 rounded" 
-                                 onclick="window.handleSearchResult(${index})">
-                                ${item.label}
-                            </div>
-                        `).join('')}
-                    </div>
-                `,
-                showConfirmButton: false,
-                showCloseButton: true
-            });
-        }
+        } 
         setIsSearching(false);
     };
 
@@ -437,16 +436,19 @@ const SidebarPanel = () => {
                 className={`transition-width duration-300 ${isOpen ? 'w-64' : 'w-16'} h-screen relative flex flex-col shadow-md border border-gray-700`}
                 style={{ backgroundColor: '#2d3748', color: '#f7fafc' }}
             >
-                <div className={`
-                        flex items-center justify-start py-4 px-3
+                <NavLink
+                    to="/"
+                    className={`
+                        flex items-center justify-start py-4 px-3 cursor-pointer
                         ${isOpen ? 'space-x-2' : 'justify-center'}
                         border-b border-gray-700/50
                         bg-gradient-to-r from-gray-800 to-gray-700
-                        shadow-lg`}>
-                                        <img
-                                            src="/diversity.png"
-                                            alt="Logo Junta de Vecinos"
-                                            className={`
+                        shadow-lg`}
+                >
+                    <img
+                        src="/diversity.png"
+                        alt="Logo Junta de Vecinos"
+                        className={`
                             ${isOpen ? 'w-10 h-10' : 'w-8 h-8'}
                             object-cover
                             transition-all duration-300
@@ -454,7 +456,7 @@ const SidebarPanel = () => {
                             shadow-md
                             hover:scale-105
                             border-2 border-gray-600/30`}
-                                        />
+                    />
                     {isOpen && (
                         <div className="flex flex-col min-w-0">
                             <h2 className="text-sm font-bold text-white truncate">
@@ -464,12 +466,12 @@ const SidebarPanel = () => {
                             <div className="flex items-center">
                                 <span className="h-1.5 w-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse"></span>
                                 <span className="text-xs text-gray-400">
-                                    Pudahuel
+                                    Providencia
                                 </span>
                             </div>
                         </div>
                     )}
-                </div>
+                </NavLink>
 
                 <div className="absolute right-0 top-0 transform translate-x-1/2">
                     <button
@@ -730,10 +732,24 @@ const SidebarPanel = () => {
 
                         {/* Mensaje cuando no hay resultados */}
                         {searchTerm && filteredItems.length === 0 && !isSearching && (
-                            <div
+                            <div 
+                                ref={messageRef}
                                 className="absolute mt-2 w-full max-w-4xl p-4 bg-white rounded-lg shadow-lg border border-gray-200 text-center"
                                 style={{ backgroundColor: themes.background, borderColor: themes.border }}
                             >
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                                    aria-label="Cerrar"
+                                >
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </button>
                                 <p className="text-gray-500">No se encontraron resultados para "{searchTerm}"</p>
                             </div>
                         )}

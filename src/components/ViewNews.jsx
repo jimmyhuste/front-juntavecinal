@@ -195,7 +195,7 @@ export const ViewNews = () => {
                                     {new Date(article.publishedAt).toLocaleDateString()} • {article.category}
                                 </p>
                                 <h3 className="text-lg font-semibold mt-2" style={{ color: themes.text }}>{article.title}</h3>
-                                <p className="mt-2" style={{ color: themes.secondary }}>
+                                <p className="mt-2 mb-4 px-1 text-sm text-left" style={{ color: themes.secondary }}>
                                     {truncateDescription(article.description)}
                                 </p>
                                 <div className="flex justify-between items-center mt-4">
@@ -240,21 +240,6 @@ export const ViewNews = () => {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                 </div>
             )}
-
-            {/* Modificado el mensaje de "no hay más noticias"
-            {!hasMore && articles.length > 0 && (
-                <div className="max-w-2xl mx-auto mt-8">
-                    <div className="flex flex-col items-center justify-center p-8 bg-gray-700 rounded-lg border-2 border-gray-600">
-                        <FaClock size={50} className="text-gray-400 mb-4" />
-                        <p className="text-xl text-gray-300 text-center font-medium">
-                            No hay más noticias para mostrar.
-                        </p>
-                        <p className="text-gray-400 text-center mt-2">
-                            Las nuevas noticias aparecerán aquí
-                        </p>
-                    </div>
-                </div>
-            )} */}
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}

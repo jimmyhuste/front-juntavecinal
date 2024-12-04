@@ -66,17 +66,17 @@ const CertificadoStatus = () => {
     const actionConfig = {
         download: {
             icon: <FaDownload size={20} className="text-green-500" />,
-            label: 'Descargar',
+            label: '',
             textColor: 'text-green-500'
         },
         preview: {
             icon: <FaEye size={20} className="text-blue-500" />,
-            label: 'Visualizar',
+            label: '',
             textColor: 'text-blue-500'
         },
         rejection: {
             icon: <FaExclamationCircle size={20} className="text-red-500" />,
-            label: 'Ver Motivo',
+            label: 'Motivo',
             textColor: 'text-red-500'
         }
     };
@@ -238,11 +238,9 @@ const CertificadoStatus = () => {
 
     return (
         <div className="flex-1 p-6 overflow-y-auto h-screen w-full mt-8" style={{ backgroundColor: themes.background }}>
-            <div className="w-full rounded-lg p-8 mx-auto bg-gray-800">
-                <h2 className="mb-8 text-center text-2xl font-bold leading-9 text-white">
+                <h2 className="mb-8 text-center text-2xl font-bold leading-9 tracking-tight">
                     Estado de Mis Solicitudes
                 </h2>
-
                 {requests.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-8 bg-gray-700 rounded-lg border-2 border-gray-600">
                         <FaClock size={50} className="text-gray-400 mb-4" />
@@ -259,9 +257,9 @@ const CertificadoStatus = () => {
                             <thead>
                                 <tr className="bg-gray-900 border border-gray-700">
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">N° Solicitud</th>
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-200">Nombre Completo</th>
+                                    <th className="py-3 px-4 text-left font-semibold text-gray-200">Nombres</th>
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Rut</th>
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-200">Fecha de Solicitud</th>
+                                    <th className="py-3 px-4 text-left font-semibold text-gray-200">Fecha Solicitud</th>
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Relación</th>
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Tipo Certificado</th>
                                     <th className="py-3 px-4 text-left font-semibold text-gray-200">Estado</th>
@@ -275,7 +273,7 @@ const CertificadoStatus = () => {
                                         <td className="py-3 px-4 text-gray-300">{request.user}</td>
                                         <td className="py-3 px-4 text-gray-300">{formatRut(request.rut)}</td>
                                         <td className="py-3 px-4 text-gray-300">
-                                            {dayjs(request.dateCreation).format('DD/MM/YYYY : HH:mm:ss')}
+                                            {dayjs(request.dateCreation).format('DD/MM/YYYY HH:mm')}
                                         </td>
                                         <td className="py-3 px-4 text-gray-300">{request.relationship.toUpperCase()}</td>
                                         <td className="py-3 px-4 text-gray-300">{request.typeCertificate}</td>
@@ -324,7 +322,6 @@ const CertificadoStatus = () => {
                         </table>
                     </div>
                 )}
-            </div>
 
             <Modal
                 isOpen={isModalOpen}

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import regionesData from '../../src/utils/comunaRegion.json'
 
-const {regiones, comunasPorRegion} = regionesData;
+const { regiones, comunasPorRegion } = regionesData;
 
 // Validaciones
 const isValidCharacter = (value) => /^[A-Za-zÀ-ÿ\s]+$/.test(value);
@@ -28,9 +28,9 @@ const Register = () => {
     role: 'MEMBER',
     photo: null,
     housingType: '',
-    dateOfBirth: '', 
-    comuna: '', 
-    region: '', 
+    dateOfBirth: '',
+    comuna: '',
+    region: '',
   });
 
   const { themes } = useTheme();
@@ -115,7 +115,7 @@ const Register = () => {
       const birthDate = new Date(formData.dateOfBirth);
       const today = new Date();
       const age = today.getFullYear() - birthDate.getFullYear();
-      
+
       if (age < 18) {
         newErrors.dateOfBirth = "Debes ser mayor de 18 años";
       } else if (age > 120) {
@@ -175,7 +175,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validar formulario
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
@@ -184,14 +184,14 @@ const Register = () => {
       console.log(firstError);
       return;
     }
-  
+
     try {
       const formDataToSend = new FormData();
-      
+
       // Obtener el nombre de la región seleccionada
       const regionSeleccionada = regiones.find(r => r.id === formData.region);
       const nombreRegion = regionSeleccionada ? regionSeleccionada.name : '';
-      
+
       // Agregar campos al FormData
       Object.keys(formData).forEach(key => {
         if (key === 'rut') {
@@ -207,7 +207,7 @@ const Register = () => {
           formDataToSend.append(key, formData[key]);
         }
       });
-  
+
       // Imprimir el FormData para depuración
       for (let pair of formDataToSend.entries()) {
         console.log(pair[0] + ': ' + pair[1]);
@@ -218,7 +218,7 @@ const Register = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       Swal.fire({
         icon: 'success',
         title: 'Registro exitoso',
@@ -226,14 +226,14 @@ const Register = () => {
         timer: 2000,
         timerProgressBar: true
       });
-  
+
       navigate('/panel');
-  
+
     } catch (error) {
       console.error('Error al registrarse:', error);
-      
+
       let errorMessage = "Hubo un error al registrar al usuario. Por favor, intente nuevamente.";
-  
+
       if (error.response) {
         if (error.response.data.rut) {
           errorMessage = error.response.data.rut[0];
@@ -243,7 +243,7 @@ const Register = () => {
           errorMessage = error.response.data.detail;
         }
       }
-  
+
       Swal.fire({
         icon: 'error',
         title: 'Error en el registro',
@@ -256,26 +256,26 @@ const Register = () => {
 
   const Loader = () => {
     return (
-        <div className="flex justify-center items-center">
-            <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="white">
-                <g fill="none" fillRule="evenodd">
-                    <g transform="translate(1 1)" strokeWidth="2">
-                        <circle strokeOpacity=".5" cx="18" cy="18" r="18"/>
-                        <path d="M36 18c0-9.94-8.06-18-18-18">
-                            <animateTransform
-                                attributeName="transform"
-                                type="rotate"
-                                from="0 18 18"
-                                to="360 18 18"
-                                dur="1s"
-                                repeatCount="indefinite"/>
-                        </path>
-                    </g>
-                </g>
-            </svg>
-        </div>
+      <div className="flex justify-center items-center">
+        <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="white">
+          <g fill="none" fillRule="evenodd">
+            <g transform="translate(1 1)" strokeWidth="2">
+              <circle strokeOpacity=".5" cx="18" cy="18" r="18" />
+              <path d="M36 18c0-9.94-8.06-18-18-18">
+                <animateTransform
+                  attributeName="transform"
+                  type="rotate"
+                  from="0 18 18"
+                  to="360 18 18"
+                  dur="1s"
+                  repeatCount="indefinite" />
+              </path>
+            </g>
+          </g>
+        </svg>
+      </div>
     );
-};
+  };
   return (
     <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8" style={{ backgroundColor: themes.background }}>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -554,15 +554,15 @@ const Register = () => {
 
             {/* Botón de envío */}
             <div className="sm:col-span-2">
-            <button
-    type="submit"
-    className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold 
+              <button
+                type="submit"
+                className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold 
              leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline 
              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-    disabled={isLoading}
->
-    {isLoading ? <Loader /> : "Crear cuenta"}
-</button>
+                disabled={isLoading}
+              >
+                {isLoading ? <Loader /> : "Crear cuenta"}
+              </button>
             </div>
           </form>
         </div>

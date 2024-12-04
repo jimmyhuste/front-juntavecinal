@@ -264,8 +264,7 @@ const CertificadoMoveStatus = () => {
 
     return (
         <div className="flex-1 p-2 overflow-y-auto h-screen w-full mt-8" style={{ backgroundColor: themes.background }}>
-            <div className="w-full rounded-lg p-8 mx-auto bg-gray-800">
-                <h2 className="mb-8 text-center text-2xl font-bold leading-9 text-white">
+                <h2 className="mb-8 text-center text-2xl font-bold leading-9 tracking-tight">
                     Gestionar Solicitudes de Certificado
                 </h2>
 
@@ -286,9 +285,9 @@ const CertificadoMoveStatus = () => {
                                 <thead>
                                     <tr className="bg-gray-900 border border-gray-700">
                                         <th className="py-3 px-4 text-left font-semibold text-gray-200">N° Solicitud</th>
-                                        <th className="py-3 px-4 text-left font-semibold text-gray-200">Nombre Completo</th>
+                                        <th className="py-3 px-4 text-left font-semibold text-gray-200">Nombres</th>
                                         <th className="py-3 px-4 text-left font-semibold text-gray-200">Rut</th>
-                                        <th className="py-3 px-4 text-left font-semibold text-gray-200">Fecha de Solicitud</th>
+                                        <th className="py-3 px-4 text-left font-semibold text-gray-200">Fecha Solicitud</th>
                                         <th className="py-3 px-4 text-left font-semibold text-gray-200">Relación</th>
                                         <th className="py-3 px-4 text-left font-semibold text-gray-200">Estado</th>
                                         <th className="py-3 px-4 text-left font-semibold text-gray-200">Acción</th>
@@ -301,7 +300,7 @@ const CertificadoMoveStatus = () => {
                                             <td className="py-3 px-4 text-gray-300">{request.user}</td>
                                             <td className="py-3 px-4 text-gray-300">{formatRut(request.rut)}</td>
                                             <td className="py-3 px-4 text-gray-300">
-                                                {dayjs(request.dateCreation).format('DD/MM/YYYY : HH:mm:ss')}
+                                                {dayjs(request.dateCreation).format('DD/MM/YYYY HH:mm')}
                                             </td>
                                             <td className="py-3 px-4 text-gray-300">{request.relationship.toUpperCase()}</td>
                                             <td className="py-3 px-4 text-gray-300">
@@ -406,7 +405,6 @@ const CertificadoMoveStatus = () => {
                     </>
                 )}
             </div>
-        </div>
     );
 };
 

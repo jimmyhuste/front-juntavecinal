@@ -23,6 +23,16 @@ export const UserDetails = () => {
         fetchFamilyMembers();
     }, [rut]);
 
+    const getRolName = (role) => {
+        switch (role) {
+            case 1:
+                return 'Admin';
+            case 2:
+                return 'Miembro';
+            default:
+                return role;
+        }
+    };
     const fetchUserDetails = () => {
         fetch(`${BASE_URL}/user/list/one/?rut=${rut}`, {
             method: 'GET',
@@ -129,7 +139,7 @@ export const UserDetails = () => {
                             <label className="mb-1 text-gray-400 font-semibold">Teléfono</label>
                             <input
                                 type="text"
-                                value={user.phone}
+                                value={user.phoneNumber}
                                 disabled
                                 className="bg-gray-700 text-white p-2 rounded-lg border border-gray-600 focus:outline-none"
                             />
@@ -147,7 +157,7 @@ export const UserDetails = () => {
                             <label className="mb-1 text-gray-400 font-semibold">Rol</label>
                             <input
                                 type="text"
-                                value={user.role}
+                                value={getRolName(user.role)}
                                 disabled
                                 className="bg-gray-700 text-white p-2 rounded-lg border border-gray-600 focus:outline-none"
                             />

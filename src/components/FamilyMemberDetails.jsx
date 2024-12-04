@@ -205,7 +205,7 @@ const FamilyMemberDetails = () => {
                             <label className="mb-1 text-gray-400 font-semibold">Teléfono</label>
                             <input
                                 type="text"
-                                value={user.phone}
+                                value={user.phoneNumber}
                                 disabled
                                 className="bg-gray-700 text-white p-2 rounded-lg border border-gray-600 focus:outline-none"
                             />
