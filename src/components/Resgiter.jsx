@@ -213,6 +213,7 @@ const Register = () => {
         console.log(pair[0] + ': ' + pair[1]);
       }
       console.log(formDataToSend)
+
       const response = await axios.post(`${BASE_URL}/register/`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -238,16 +239,6 @@ const Register = () => {
         if (error.response.status === 400 && error.response.data.error === "Invalid comuna request") {
           errorMessage = "Comuna inválida. Por favor, seleccione una comuna válida.";
         } else if (error.response.data.rut) {
-          errorMessage = error.response.data.rut[0];
-        } else if (error.response.data.photo) {
-          errorMessage = "Error con la foto: " + error.response.data.photo[0];
-        } else if (error.response.data.detail) {
-          errorMessage = error.response.data.detail;
-        }
-      }
-      
-      if (error.response) {
-        if (error.response.data.rut) {
           errorMessage = error.response.data.rut[0];
         } else if (error.response.data.photo) {
           errorMessage = "Error con la foto: " + error.response.data.photo[0];
