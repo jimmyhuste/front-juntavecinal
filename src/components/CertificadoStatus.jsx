@@ -273,7 +273,7 @@ const CertificadoStatus = () => {
                                         <td className="py-3 px-4 text-gray-300">{request.user}</td>
                                         <td className="py-3 px-4 text-gray-300">{formatRut(request.rut)}</td>
                                         <td className="py-3 px-4 text-gray-300">
-                                            {dayjs(request.dateCreation).format('DD/MM/YYYY HH:mm')}
+                                            {dayjs(request.dateCreation).format('DD/MM/YYYY')}
                                         </td>
                                         <td className="py-3 px-4 text-gray-300">{request.relationship.toUpperCase()}</td>
                                         <td className="py-3 px-4 text-gray-300">{request.typeCertificate}</td>
