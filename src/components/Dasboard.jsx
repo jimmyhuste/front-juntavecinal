@@ -112,7 +112,7 @@ const Dashboard = () => {
   }
 
   const getTooltipContent = (params) => {
-    return `${params.value} usuarios`;
+    return `${params.value}`;
   };
 
   return (
@@ -150,10 +150,10 @@ const Dashboard = () => {
                 series={[{
                   data: transformDemographicData(dashboardData.demografia_usuarios_y_miembros),
                   highlightScope: { faded: 'global', highlighted: 'item' },
-                  valueFormatter: (item) => `${item.value} usuarios`,
+                  valueFormatter: (item) => `${item.value}`,
                   arcLabel: null,
                   tooltip: {
-                    formatter: (params) => `${params.name}: ${params.value} usuarios`
+                    formatter: (params) => `${params.name}: ${params.value}`
                   }
                 }]}
                 {...pieChartSettings}
